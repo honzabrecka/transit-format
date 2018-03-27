@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# prerequisite
+# - php >=5.6
+# - composer >=1.6
+# - nodejs >=8
+
+cd `dirname $0`/../..
+
+if [ ! -d "transit-php" ]; then
+  git clone git@github.com:honzabrecka/transit-php.git
+  cd transit-php
+  composer install
+else
+  echo "transit-php exists"
+fi

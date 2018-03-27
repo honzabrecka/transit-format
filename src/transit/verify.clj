@@ -254,7 +254,8 @@
   `transit` repository."
   [encoding]
   (map #(transit->test-input (read-bytes %) encoding)
-       (filter #(and (.isFile %) (.endsWith (.getName %) (extension encoding)))
+       (filter #(and (.isFile %) (.endsWith (.getName %) (extension encoding))
+                                 (not (.endsWith (.getName %) ".verbose.json")))
                (file-seq (io/file "../transit-format/examples/0.8/simple")))))
 
 (defn filter-tests
@@ -267,6 +268,16 @@
   (let [transit-exemplars (exemplar-transit encoding)]
     (filter #((:pred %) proc encoding opts)
             [{:pred (constantly true)
+              :desc "exemplar file"
+              :input transit-exemplars
+              :test-name :exemplar-file
+              :test #(test-each proc %)}
+              {:pred (fn [_ _ o] (:gen o))
+              :desc "generated EDN"
+              :input (mapv #(edn->test-input % encoding) (:generated-forms opts))
+              :test-name :generated-edn
+              :test #(test-each proc %)}]
+            #_[{:pred (constantly true)
               :desc "exemplar file"
               :input transit-exemplars
               :test-name :exemplar-file
@@ -355,7 +366,8 @@
                        "transit-jruby"
                        "transit-js"
                        "transit-python"
-                       "transit-ruby"})
+                       "transit-ruby"
+                       "transit-php"})
 
 (defn verify
   "Given user provided options, run all tests specified by the
